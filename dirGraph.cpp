@@ -3,7 +3,9 @@
 #include <cstdlib>
 #include <queue>
 #include <stack>
+#include <vector>
 #include <climits>
+#include <memory.h>
 
 #include "dirGraph.h"
 #include "undirWeightedG.h"
@@ -106,10 +108,12 @@ int dirGraph::findVertex(string const &key, int left, int right) const
         return -1;
     }
 
-    if(this->compStrAscend(ver[mid]->key, key) == 0){
+    int alphaOrder = compStrAscend(key, ver[mid]->key);
+
+    if(alphaOrder == 0){
         return mid;
     }
-    else if(this->compStrAscend(key, ver[mid]->key) == 1){
+    else if(alphaOrder == 1){
         return findVertex(key, left, mid-1);
     }
     else{
@@ -160,6 +164,57 @@ void dirGraph::_eraseVer(Node* &head)
     return;
 }
 
+// Helper of isCyclic() function:
+// Return true if cyclic;
+// Else return false.
+// DFS based:
+bool dirGraph::_isCyclic(string const &key, int isVisited[]) const
+{
+    // Get vertex's position in the graph;
+    int k = findVertex(key,0,numVer-1);
+
+    //
+    if(isVisited[k] == 0) // Not visited yet.
+    {
+        // Mark as visited:
+        isVisited[k] = 1;
+
+        // Variable to return:
+        bool toReturn = false;
+
+        // search all successor:
+        Node* finder = ver[k]->next;
+        while(finder != NULL)
+        {
+            // One return a true, then final result will be true:
+            toReturn = _isCyclic(finder->key, isVisited) || toReturn;
+
+            // Cycle detected:
+            if(toReturn)
+            {
+                return true;
+            }
+
+            // Search next successor:
+            finder = finder->next;
+        }
+
+        // Done searching this round, mark as done!
+        isVisited[k] = 2;
+
+        // If no cycle detected, return false:
+        return false;
+    }
+    else if(isVisited[k] == 1) // Run into vertex we just searched, cycle detected!
+    {
+        return true;
+    }
+    else // isVisited[k] == 2: // Already searched in last rounds, just return false.
+    {
+        return false;
+    }
+}
+
 // Helper of topoOrder:
 // If this graph is DAG, print vertexes in topological order;
 // If this graph is acyclic, show there is a cycle and print all
@@ -169,8 +224,8 @@ void dirGraph::_eraseVer(Node* &head)
 bool dirGraph::_topoOrder(string const &start, int visited[], stack<string> &noSuccessor, queue<string> &loop) const
 {
     int k = findVertex(start,0,numVer);
-    int toReturn = true;
 
+    // Not visited case:
     if(visited[k] == 0) // Not visited:
     {
         visited[k] = 1; // mark as visited.
@@ -179,7 +234,7 @@ bool dirGraph::_topoOrder(string const &start, int visited[], stack<string> &noS
         Node* finder = ver[k]->next;
         while(finder != NULL)
         {
-            if(toReturn = _topoOrder(finder->key, visited, noSuccessor, loop) == false)
+            if(_topoOrder(finder->key, visited, noSuccessor, loop) == false)
             {
                 return false;
             }
@@ -190,7 +245,7 @@ bool dirGraph::_topoOrder(string const &start, int visited[], stack<string> &noS
         noSuccessor.push(start);
         return true;
     }
-
+    // Visited in current loop case:
     else if(visited[k] == 1) // visited current loop.
     {
         if(!loop.empty() && start == loop.front())
@@ -232,7 +287,7 @@ bool dirGraph::_topoOrder(string const &start, int visited[], stack<string> &noS
         }
         return true;
     }
-
+    // Finished in last loop case:
     else // closed in previous loops.
     {
         return true;
@@ -265,6 +320,39 @@ int dirGraph::countDFS(string const &key, int isVisited[]) const
         }
         return totolNum;
     }
+}
+
+// Called by topoOrder_BFS()
+// Gets predecessor information and stores them into dynamic array:
+void dirGraph::predeInfo(int predInfo[]) const
+{
+    // Set Dynamic array zero;
+    memset(predInfo,0,(numVer << 2));
+
+    // Search for every edge to calculate number of predecessors.
+    for(int i=0; i<numVer; i++)
+    {
+        // Search successors of each vertex:
+        Node* finder = ver[i]->next;
+        while(finder != NULL)
+        {
+            // Get successor vertex index in this graph:
+            int k = findVertex(finder->key,0,numVer-1);
+
+            //cout << "This: " << k << endl;
+
+            // Mark the successor index with number of its predecessors:
+            predInfo[k]++; // element of predInfo stores predecessors numbers of each vertex.
+
+            // Next successor:
+            finder = finder->next;
+        }
+    }
+
+    /** Now all info about vertexes' predecessor had been stored in predInfo.
+    **/
+
+    return;
 }
 
 
@@ -378,6 +466,8 @@ int dirGraph::DFS(string const &key) const
 // Return 0 if successfully add one vertex;
 // Return 1 if the vertex is already there;
 // Return -1 if vertexes more or equal than N.
+
+// Algorithm: Binary search:
 int dirGraph::addVertex(string const &key)
 {
     // Overflow case:
@@ -636,6 +726,66 @@ int dirGraph::hasInEdges(string const &key) const
     return 0;
 }
 
+// Return 1 if the graph is cyclic;
+// Return 0 if not.
+// DFS based.
+bool dirGraph::isCyclic() const
+{
+    // Record of statues of vertexes: visited or not:
+    // If not visited, mark as 0;
+    // If visited in current search, mark as 1;
+    // If visited in last searches, mark as 2.
+    // Initialized to zero.
+    int* isVisited = new int[numVer]();
+
+    // Record of vertexes' predecessors:
+    // 0: no predecessor;
+    // 1: predecessor.
+    int* predecessor = new int[numVer]();
+
+    // Find out vertexes having predecessor:
+    for(int i=0; i<numVer; i++)
+    {
+        Node* finder = ver[i]->next;
+        while(finder != NULL)
+        {
+            predecessor[findVertex(finder->key,0,numVer-1)] = 1; // mark as having predecessor.
+            finder = finder->next;
+        }
+    }
+
+    // If no vertex without predecessor, true:
+    bool noPredecessorCycle = true;
+
+    // Search vertexes without predecessor and using as a start vertex:
+    for(int i=0; i<numVer; i++)
+    {
+        if(predecessor[i] == 0)
+        {
+            // We have vertex without predecessor, put it false:
+            noPredecessorCycle = false;
+
+            // Detect if there are inner cycle (has vertex without predecessor but still has a cycle):
+            if(_isCyclic(ver[i]->key, isVisited)) // Inner cycle detected.
+            {
+                return true;
+            }
+        }
+    }
+
+    // Determine cyclic or not:
+    if(noPredecessorCycle)
+    {
+        // no predecessor cycle detected, return true:
+        return true;
+    }
+    else
+    {
+        // No no - predecessor - cycle, and no inner cycle, return false:
+        return false;
+    }
+}
+
 // Do topological Sort on this graph:
 // If this graph is DAG, print vertexes in topological order;
 // If this graph is acyclic, show there is a cycle and print all
@@ -656,7 +806,7 @@ bool dirGraph::topoOrder_DFS() const
         Node* finder = ver[i]->next;
         while(finder != NULL)
         {
-            noPredecessor[findVertex(finder->key,0,numVer)] = 1; // mark as having predecessor.
+            noPredecessor[findVertex(finder->key,0,numVer-1)] = 1; // mark as having predecessor.
             finder = finder->next;
         }
     }
@@ -697,6 +847,103 @@ bool dirGraph::topoOrder_DFS() const
         i++;
     }
 
+    return true;
+}
+
+// Do topological Sort ion this graph:
+// If this graph is DAG, print vertexes in topological order;
+// If this graph is acyclic, show there is a cycle and print all
+// edges forming the cycle:
+// Return true if DAG;
+// Return false if cyclic:
+// Using dynamic array:
+bool dirGraph::topoOrder_BFS() const
+{
+    // Dynamic array used to store predecessor info of each vertex:
+    int* predInfo = new int[numVer]();  // O(v + e)
+
+    // Record of topological order:
+    // Index = topological order:
+    int* order = new int[numVer]();
+
+    // Get the predecessor info:
+    predeInfo(predInfo);
+
+    // Check if the graph has cycle:
+    if(isCyclic())
+    {
+        // Return false if cyclic:
+        // Nothing will be printed on console:
+        return false;
+    }
+
+    /** Topological order is the order that these vertexes been pushed into the queue:
+        This algorithm put vertexes without predecessor to the queue all at one round.
+    **/
+
+    // Now, enqueue all vertexes without predecessor:
+    queue<int> q;
+
+    for(int i=0; i<numVer; i++)
+    {
+        if(predInfo[i] == 0)
+        {
+            q.push(i); // Here, i indicates the position of vertex in the graph.
+        }
+    }
+
+    // Block of int i:
+   {
+       // Get and Record topological order:
+        register int i = 0;
+
+        // Dequeue if queue is not empty:
+        while(!q.empty())
+        {
+            // Search successors of popped vertex:
+            Node* finder = ver[q.front()]->next;
+            while(finder != NULL)
+            {
+                // Successor number:
+                int k = findVertex(finder->key,0,numVer-1);
+
+                // Decrease number of predecessor:
+                // Push vertex without predecessor:
+                if(--predInfo[k] == 0)
+                {
+                    q.push(k);
+                }
+
+                // continue search;
+                finder = finder->next;
+            }
+
+            // Records topological order:
+            order[i] = q.front();
+
+            // Pop:
+            q.pop();
+
+            // increment topological order:
+            i++;
+        }
+   }
+
+    // Print out topological order;
+    for(int i=0; i<numVer; i++)
+    {
+        // Print to console in a format:
+        cout << ver[order[i]]->key << "\tTopological Order: " << i << endl;
+    }
+
+    // Free memory space:
+    for(int i=0; i<numVer; i++)
+    {
+        delete (predInfo + i);
+        delete (order + i);
+    }
+
+    // Return true if acyclic:
     return true;
 }
 
@@ -801,22 +1048,23 @@ int dirGraph::Dijkstra(string const &startVer) const
     }
 
     // Dijkstra:
-    int start = findVertex(startVer,0,numVer); // The vertex to start.
     string key[N] = {""};
     int weight[N] = {0};
 
     // Build heap:
     minHeap h;
-    int i = 0;
-    while(ver[i] != NULL){
+    register int i = 0;
+    while(ver[i] != NULL)
+    {
         h.insert(ver[i]->key, M);
         i++;
     }
     h.reHeap(startVer, 0);
 
-    //
+    // Print out distance result from starting point of all vertexes:
     i = 0;
-    while(!h.isEmpty()){
+    while(!h.isEmpty())
+    {
         key[i] = h.topStr();
         weight[i] = h.topWeight();
 
@@ -824,12 +1072,16 @@ int dirGraph::Dijkstra(string const &startVer) const
         cout << key[i] << " " << weight[i] << endl;
 
         Node* child = ver[findVertex(key[i],0,numVer)]->next;
-        while(child != NULL){
+        while(child != NULL)
+        {
             h.reHeap(child->key, weight[i] + child->weight);
             child = child->next;
         }
         i++;
     }
+
+    // Normal return:
+    return 1;
 }
 
 dirGraph* dirGraph::copyOf() const

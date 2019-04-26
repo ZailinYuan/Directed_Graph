@@ -1,5 +1,6 @@
 /**
     Use an array of struct Node and Linked list of struct Node to implement directed graph.
+    __Adjacent Array
 **/
 
 #include <iostream>
@@ -45,6 +46,11 @@ class dirGraph
         // Helper of eraseVer():
         void _eraseVer(Node* &head);
 
+        // Helper of isCyclic() function:
+        // Return true if cyclic;
+        // Else return false.
+        bool _isCyclic(string const &key, int isVisited[]) const;
+
         // Helper of topoOrder:
         // If this graph is DAG, print vertexes in topological order;
         // If this graph is acyclic, show there is a cycle and print all
@@ -55,6 +61,10 @@ class dirGraph
 
         // Return number of vertexes by DFS:
         int countDFS(string const &key, int isVisited[]) const;
+
+        // Called by topoOrder_BFS()
+        // Gets predecessor information and stores them into dynamic array:
+        void predeInfo(int predInfo[]) const;
 
         // De-constructor:
         void deconstruct(Node* head);
@@ -128,6 +138,11 @@ class dirGraph
         // Print all edges coming to the vertex specified:
         void inEdgesOF(string const &key) const;
 
+        // Return 1 if the graph is cyclic;
+        // Return 0 if not.
+        // DFS based.
+        bool isCyclic() const;
+
         // Do topological Sort ion this graph:
         // If this graph is DAG, print vertexes in topological order;
         // If this graph is acyclic, show there is a cycle and print all
@@ -142,8 +157,7 @@ class dirGraph
         // edges forming the cycle:
         // Return 1 if DAG;
         // Return 0 if acyclic:
-        bool topoOrder_DFS() const; /** to be done
-                                    **/
+        bool topoOrder_BFS() const;
 
         // Return 0 if not connected:
         // Return 1 if weakly connected:

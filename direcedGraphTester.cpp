@@ -17,6 +17,7 @@ void graph3();
 void graph4(bool cycle);
 void graph5();
 void graph6();
+void graph7();
 void helper();
 
 int main()
@@ -64,6 +65,10 @@ int main()
 
             case 6:
                 graph6();
+                break;
+
+            case 7:
+                graph7();
                 break;
 
             default:
@@ -159,6 +164,9 @@ void graph2()
 
     L2
     g.topoOrder_DFS();
+
+    L2
+    cout << g.isCyclic() << endl;
 }
 
 void graph3()
@@ -193,6 +201,9 @@ void graph3()
     L2
 
     g.topoOrder_DFS();
+
+    L2
+    cout << g.isCyclic() << endl;
 }
 
 void graph4(bool cycle)
@@ -292,6 +303,10 @@ void graph4(bool cycle)
     }
 
     g.Dijkstra("A");
+
+    L2
+
+    cout << g.isCyclic() << endl;
 }
 
 void graph5()
@@ -308,9 +323,12 @@ void graph5()
     g.addEdge("C", "D", 1);
     g.addEdge("D", "A", 1);
 
-    cout << g.connectivity() << endl;
+    //cout << g.connectivity() << endl;
 
-    g.Dijkstra("A");
+    //g.Dijkstra("A");
+
+    L2
+    cout << g.isCyclic() << endl;
 }
 
 void graph6()
@@ -354,16 +372,57 @@ void graph6()
     g2->Dijkstra("LAX");
 }
 
+void graph7()
+{
+    dirGraph g;
+
+    g.addVertex("1");
+    g.addVertex("2");
+    g.addVertex("3");
+    g.addVertex("4");
+    g.addVertex("5");
+    g.addVertex("6");
+    g.addVertex("7");
+    g.addVertex("8");
+    g.addVertex("9");
+    g.addVertex("10");
+    g.addVertex("0");
+
+    g.eraseVer("10");
+
+    g.addEdge("0", "1", 1);
+    g.addEdge("0", "5", 1);
+    g.addEdge("1", "2", 1);
+    g.addEdge("2", "4", 1);
+    g.addEdge("1", "3", 1);
+    g.addEdge("1", "5", 1);
+    g.addEdge("4", "3", 1);
+    g.addEdge("5", "6", 1);
+    g.addEdge("6", "8", 1);
+    g.addEdge("7", "3", 1);
+    g.addEdge("7", "8", 1);
+    g.addEdge("8", "10", 1);
+    g.addEdge("9", "4", 1);
+    g.addEdge("9", "7", 1);
+    g.addEdge("9", "10", 1);
+
+    g.printAllVer();
+    g.printAllEdges();
+
+    cout << g.isCyclic() << endl;
+
+    g.topoOrder_BFS();
+}
+
 void helper()
 {
     cout << "All graphs are: " << endl;
     cout << "\tGraph1 is nothing." << endl;
-    cout << "\tGraph2 is nothing." << endl;
-    cout << "\tGraph3 is nothing." << endl;
-    cout << "\tGraph5 is nothing." << endl;
-    cout << "\tGraph6 is Floyd - Warshall Example." << endl;
-
-    cout << "\tGraph4 is the most valuable." << endl;
+    cout << "\tGraph2 is a simple cyclic directed graph." << endl;
+    cout << "\tGraph3 is a simple acyclic directed graph." << endl;
+    cout << "\tGraph5 is also a simple cyclic directed graph." << endl;
+    cout << "\tGraph6 is test on Floyd - Warshall algorithm." << endl;
+    cout << "\tGraph7 is test on Topological sort BFS based algorithm." << endl;
 
     cout << "Press 1 to show graph1, and so on!" << endl;
 }
