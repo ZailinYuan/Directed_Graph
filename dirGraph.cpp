@@ -1071,7 +1071,7 @@ int dirGraph::Dijkstra(string const &startVer) const
         h.del();
         cout << key[i] << " " << weight[i] << endl;
 
-        Node* child = ver[findVertex(key[i],0,numVer)]->next;
+        Node* child = ver[findVertex(key[i],0,numVer-1)]->next;
         while(child != NULL)
         {
             h.reHeap(child->key, weight[i] + child->weight);
