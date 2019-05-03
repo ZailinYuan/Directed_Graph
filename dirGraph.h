@@ -129,10 +129,10 @@ class dirGraph
         int ugEdgeW(string const &key1, string const &key2, int weight) const;
 
         // Return number of vertexes in graph:
-        int numOfVer() const;
+        inline int numOfVer() const {return numVer;};
 
         // Return number of edges in graph:
-        int numOfEdge() const;
+        inline int numOfEdge() const {return numEdge;};
 
         // Detect if a vertex has in-edges:
         // Return 1 if it does;

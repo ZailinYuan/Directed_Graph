@@ -686,6 +686,7 @@ int dirGraph::ugEdgeW(string const &key1, string const &key2, int weight) const
     return 0;
 }
 
+/**
 // Return how many vertexes in this graph:
 int dirGraph::numOfVer() const
 {
@@ -693,10 +694,11 @@ int dirGraph::numOfVer() const
 }
 
 // Return how many edges in this graph:
-int dirGraph::numOfEdge() const
+inline int dirGraph::numOfEdge() const
 {
     return numEdge;
 }
+**/
 
 // Detect if a vertex has in-edges:
 // Return 1 if it does;
