@@ -1,3 +1,7 @@
+#ifndef __MINHEAP__
+#define __MINHEAP__
+
+
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -48,3 +52,5 @@ class minHeap
         void traverse() const;
 
 };
+
+#endif // __MINHEAP__

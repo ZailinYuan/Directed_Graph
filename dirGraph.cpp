@@ -17,18 +17,14 @@ using namespace std;
 
 /** Node constructors:
 **/
-dirGraph::Node::Node(string key)
+dirGraph::Node::Node(string key): key(key), next(NULL), weight(0)
 {
-    this->key = key;
-    this->next = NULL;
-    this->weight = 0;
+
 }
 
-dirGraph::Node::Node(string key, int weight)
+dirGraph::Node::Node(string key, int weight): key(key), next(NULL), weight(weight)
 {
-    this->key = key;
-    this->next = NULL;
-    this->weight = weight;
+
 }
 
 

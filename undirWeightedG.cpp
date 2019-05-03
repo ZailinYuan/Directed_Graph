@@ -14,18 +14,14 @@ using namespace std;
 /** Constructors:
 **/
 // UWGraph->Node
-UWGraph::Node::Node(string key)
+UWGraph::Node::Node(string key): key(key), next(NULL), weight(0)
 {
-    this->key = key;
-    this->next = NULL;
-    this->weight = 0;
+
 }
 
-UWGraph::Node::Node(string key, int weight)
+UWGraph::Node::Node(string key, int weight): key(key), next(NULL), weight(weight)
 {
-    this->key = key;
-    this->next = NULL;
-    this->weight = weight;
+
 }
 
 /** Constructors:

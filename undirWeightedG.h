@@ -1,3 +1,7 @@
+#ifndef __UNDIR_WEIGHTED_GRAPH__
+#define __UNDIR_WEIGHTED_GRAPH__
+
+
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -120,3 +124,5 @@ class UWGraph
         int negativeEdge() const;
 
 };
+
+#endif // __UNDIR_WEIGHTED_GRAPH__

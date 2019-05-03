@@ -1,3 +1,7 @@
+#ifndef __DIRGRAPH__
+#define __DIRGRAPH__
+
+
 /**
     Use an array of struct Node and Linked list of struct Node to implement directed graph.
     __Adjacent Array
@@ -138,8 +142,8 @@ class dirGraph
         // Print all edges coming to the vertex specified:
         void inEdgesOF(string const &key) const;
 
-        // Return 1 if the graph is cyclic;
-        // Return 0 if not.
+        // Return true if the graph is cyclic;
+        // Return false if not.
         // DFS based.
         bool isCyclic() const;
 
@@ -185,3 +189,5 @@ class dirGraph
         dirGraph* Floyd_Warshall() const;
 
 };
+
+#endif // __DIRGRAPH__
