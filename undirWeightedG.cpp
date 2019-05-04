@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <queue>
 #include <climits>
+#include <memory.h>
 
 #include "undirWeightedG.h"
 #include "minHeap.h"
@@ -26,14 +27,29 @@ UWGraph::Node::Node(string key, int weight): key(key), next(NULL), weight(weight
 
 /** Constructors:
 **/
-UWGraph::UWGraph()
+UWGraph::UWGraph(): numVer(0), numEdge(0)
 {
-    for(int i=0; i<N; i++){
-        this->ver[i] = NULL;
-    }
+    // Initialize array of adjacent list: since no vertex at begin, set all pointers to NULL.
+    memset(ver,0,(N<<2));
+}
 
-    this->numVer = 0;
-    this->numEdge = 0;
+UWGraph::UWGraph(const UWGraph& udg): numVer(udg.numVer), numEdge(udg.numEdge)
+{
+    // Copy array in adjacent list:
+    memcpy(ver,udg.ver,(N<<2));
+
+    for(int i=0; i<N; i++)
+    {
+        // Copy linked list in adjacent list:
+        Node** finder1 = &ver[i];     // Pointer to Nodes in adjacent list of new object.
+        Node* finder2 = udg.ver[i];  // Pointer to Nodes in adjacent list of object being copied.
+        while(finder2 != NULL)
+        {
+            *finder1 = new Node(finder2->key, finder2->weight); // Copy Nodes by creating new one with exactly the same key and weight except next point to NULL.
+            finder2 = finder2->next;  // Point to next Node in ll of adj of obj being copied.
+            finder1 = &((*finder1)->next);  // Point to next pointer of new created Node.
+        }
+    }
 }
 
 UWGraph::~UWGraph()
@@ -90,6 +106,7 @@ int UWGraph::addVertex(string key)
             return 0;
         }
     }
+    return 0;
 }
 
 // If insert edge success, numEdge++:
@@ -412,11 +429,11 @@ int UWGraph::negativeEdge() const
             break;
         }
     }
+    return 0;
 }
 
 void UWGraph::Dijkstra(string startKey) const
 {
-    int start = findVertex(startKey,0,numVer); // The vertex to start.
     string key[N] = {""};
     int weight[N] = {0};
 

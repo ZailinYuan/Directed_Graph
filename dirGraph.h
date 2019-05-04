@@ -78,6 +78,10 @@ class dirGraph
     public:
         // Constructor:
         dirGraph();
+
+        // Copy constructor:
+        dirGraph(const dirGraph& dg2);
+
         // De - constructor:
         ~dirGraph();
 
@@ -183,7 +187,7 @@ class dirGraph
                                     **/
 
         // Copy object g, return the pointer to it:
-        dirGraph* copyOf() const;
+        // dirGraph* copyOf() const;
 
         // Return a directed graph that is a transitive closure of specified directed graph g:
         dirGraph* Floyd_Warshall() const;

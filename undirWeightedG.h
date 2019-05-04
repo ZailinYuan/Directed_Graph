@@ -65,6 +65,7 @@ class UWGraph
     public:
 
         UWGraph(); // constructor
+        UWGraph(const UWGraph& udg); // Copy constructor
         ~UWGraph(); // deconstructor
 
         // This function is used for testing private functions:

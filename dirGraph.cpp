@@ -30,14 +30,29 @@ dirGraph::Node::Node(string key, int weight): key(key), next(NULL), weight(weigh
 
 /** Graph constructors:
 **/
-dirGraph::dirGraph()
+dirGraph::dirGraph(): numVer(0), numEdge(0)
 {
-    for(int i=0; i<N; i++){
-        this->ver[i] = NULL;
-    }
+    // Initialize array of adjacent list: since no vertex at begin, set all pointers to NULL.
+    memset(ver,0,(N<<2));
+}
 
-    this->numVer = 0;
-    this->numEdge = 0;
+dirGraph::dirGraph(const dirGraph& dg): numVer(dg.numVer), numEdge(dg.numEdge)
+{
+    // Copy array in adjacent list:
+    memcpy(ver,dg.ver,(N<<2));
+
+    for(int i=0; i<N; i++)
+    {
+        // Copy linked list in adjacent list:
+        Node** finder1 = &ver[i];     // Pointer to Nodes in adjacent list of new object.
+        Node* finder2 = dg.ver[i];  // Pointer to Nodes in adjacent list of object being copied.
+        while(finder2 != NULL)
+        {
+            *finder1 = new Node(finder2->key, finder2->weight); // Copy Nodes by creating new one with exactly the same key and weight except next point to NULL.
+            finder2 = finder2->next;  // Point to next Node in ll of adj of obj being copied.
+            finder1 = &((*finder1)->next);  // Point to next pointer of new created Node.
+        }
+    }
 }
 
 dirGraph::~dirGraph()
@@ -1082,6 +1097,9 @@ int dirGraph::Dijkstra(string const &startVer) const
     return 1;
 }
 
+/**
+ // This part should be written as copy constructor.
+
 dirGraph* dirGraph::copyOf() const
 {
     dirGraph* gtc = new dirGraph();
@@ -1104,6 +1122,7 @@ dirGraph* dirGraph::copyOf() const
 
     return gtc;
 }
+**/
 
 dirGraph* dirGraph::Floyd_Warshall() const
 {
